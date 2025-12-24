@@ -1,59 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Timetable to Calendar</title>
+    <title>Timetable to Calendar</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#4a90e2">
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Exam Timetable Converter</h1>
-            <p>Upload your timetable (PDF, Excel, Word) and get a Calendar file.</p>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">📅 Timetable<span>Wiz</span></div>
+            <div class="steps-indicator">
+                <div class="step active" id="step-1-ind">1. Upload</div>
+                <div class="step" id="step-2-ind">2. Map</div>
+                <div class="step" id="step-3-ind">3. Preview</div>
+            </div>
         </header>
 
         <main>
-            <section id="upload-section">
-                <div id="drop-zone" class="drop-zone">
-                    <p>Drag & drop your file here or <span class="browse-btn">browse</span></p>
-                    <input type="file" id="file-input" hidden accept=".pdf,.xlsx,.csv,.docx">
+            <!-- Step 1: Upload -->
+            <section id="step-upload" class="wizard-step active">
+                <div class="card upload-card">
+                    <h2>Upload Timetable</h2>
+                    <p class="subtitle">Supports PDF, Excel, and Word documents.</p>
+
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="icon">📁</div>
+                        <p>Drag & drop your file here</p>
+                        <p class="small">or <span class="browse-link">browse files</span></p>
+                        <input type="file" id="file-input" hidden accept=".pdf,.xlsx,.csv,.docx,.doc">
+                    </div>
                 </div>
             </section>
 
-            <section id="preview-section" class="hidden">
-                <h2>Preview Events</h2>
-                <div class="table-container">
-                    <table id="events-table">
-                        <thead>
-                            <tr>
-                                <th>Course Code</th>
-                                <th>Title</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Location</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="events-body">
-                            <!-- Events will be populated here -->
-                        </tbody>
-                    </table>
+            <!-- Step 2: Mapping -->
+            <section id="step-mapping" class="wizard-step hidden">
+                <div class="card mapping-card">
+                    <div class="card-header">
+                        <h2>Map Your Columns</h2>
+                        <p>Tell us what each column represents. Leave irrelevant columns as "Ignore".</p>
+                    </div>
+
+                    <div class="controls">
+                        <label>
+                            Filter (Optional):
+                            <input type="text" id="filter-input" placeholder="e.g. CSC, MTH101, Gym Hall">
+                            <span class="tooltip">Only keep rows containing these keywords (comma separated)</span>
+                        </label>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="mapping-table">
+                            <!-- Headers with logic will be injected here -->
+                            <thead id="mapping-head"></thead>
+                            <tbody id="mapping-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn secondary-btn" onclick="goToStep('step-upload')">Back</button>
+                        <button class="btn primary-btn" id="process-btn">Preview Timetable →</button>
+                    </div>
                 </div>
-                <button id="export-btn" class="primary-btn">Download .ics Calendar File</button>
+            </section>
+
+            <!-- Step 3: Preview -->
+            <section id="step-preview" class="wizard-step hidden">
+                <div class="card preview-card">
+                    <div class="card-header">
+                        <h2>Preview Events</h2>
+                        <p>Review your exam schedule before exporting. Click cells to edit.</p>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Location</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn secondary-btn" onclick="goToStep('step-mapping')">Back</button>
+                        <button class="btn primary-btn" id="export-btn">Download .ICS File 📅</button>
+                        <button class="btn text-btn" onclick="window.location.reload()">Start Over</button>
+                    </div>
+                </div>
             </section>
         </main>
+
+        <footer>
+            <p>Exam Timetable PWA</p>
+        </footer>
+    </div>
+
+    <div id="loader" class="hidden">
+        <div class="spinner"></div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
-                .then(reg => console.log('Service Worker Registered', reg))
-                .catch(err => console.log('Service Worker Failed', err));
-        }
-    </script>
 </body>
+
 </html>

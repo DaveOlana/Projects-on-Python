@@ -13,7 +13,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 def index():
     return render_template('index.html')
 
-from utils import parse_file, create_ics
+from utils import parse_file_raw, apply_mapping_and_filter, create_ics
 
 # ... (imports remain)
 
@@ -31,9 +31,23 @@ def parse_file_route():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        events = parse_file(filepath)
+        result = parse_file_raw(filepath)
         
-        return jsonify({'message': 'File uploaded successfully', 'filename': filename, 'events': events})
+        return jsonify({'message': 'File uploaded', 'filename': filename, 'raw_rows': result.get('rows', [])})
+
+@app.route('/process_mapping', methods=['POST'])
+def process_mapping_route():
+    """
+    Takes raw rows, column mapping indices, and filters.
+    Returns the cleaned events list for preview.
+    """
+    data = request.json
+    raw_rows = data.get('raw_rows', [])
+    mapping = data.get('mapping', {})
+    filters = data.get('filters', '')
+    
+    events = apply_mapping_and_filter(raw_rows, mapping, filters)
+    return jsonify({'events': events})
 
 @app.route('/generate_ics', methods=['POST'])
 def generate_ics_route():
