@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Timetable to Calendar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#4a90e2">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exam Timetable Converter</h1>
+            <p>Upload your timetable (PDF, Excel, Word) and get a Calendar file.</p>
+        </header>
+
+        <main>
+            <section id="upload-section">
+                <div id="drop-zone" class="drop-zone">
+                    <p>Drag & drop your file here or <span class="browse-btn">browse</span></p>
+                    <input type="file" id="file-input" hidden accept=".pdf,.xlsx,.csv,.docx">
+                </div>
+            </section>
+
+            <section id="preview-section" class="hidden">
+                <h2>Preview Events</h2>
+                <div class="table-container">
+                    <table id="events-table">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-body">
+                            <!-- Events will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <button id="export-btn" class="primary-btn">Download .ics Calendar File</button>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
+                .then(reg => console.log('Service Worker Registered', reg))
+                .catch(err => console.log('Service Worker Failed', err));
+        }
+    </script>
+</body>
+</html>

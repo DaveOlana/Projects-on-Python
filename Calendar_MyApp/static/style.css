@@ -1,0 +1,117 @@
+:root {
+    --primary-color: #4a90e2;
+    --primary-hover: #357abd;
+    --bg-color: #f8f9fa;
+    --text-color: #333;
+    --card-bg: #fff;
+    --border-color: #e0e0e0;
+    --radius: 8px;
+    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.drop-zone {
+    background-color: var(--card-bg);
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--radius);
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.drop-zone:hover, .drop-zone.dragover {
+    background-color: #eaf4ff;
+    border-color: var(--primary-hover);
+}
+
+.browse-btn {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+    display: block;
+    width: 100%;
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.table-container {
+    overflow-x: auto;
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-top: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #f1f1f1;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 1rem auto;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
