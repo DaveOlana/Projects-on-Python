@@ -1,72 +1,109 @@
-import os
 from flask import Flask, render_template, request, jsonify, send_file
-from werkzeug.utils import secure_filename
+from utils import parse_natural_language, create_ics
+import os
+import json
+from datetime import datetime
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = 'exports'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max limit
 
-# Ensure upload directory exists
+# Ensure export directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
+    """Main application page"""
     return render_template('index.html')
 
-from utils import parse_file_raw, apply_mapping_and_filter, create_ics
-
-# ... (imports remain)
-
-@app.route('/parse', methods=['POST'])
-def parse_file_route():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
-    if file:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        
-        result = parse_file_raw(filepath)
-        
-        return jsonify({'message': 'File uploaded', 'filename': filename, 'raw_rows': result.get('rows', [])})
-
-@app.route('/process_mapping', methods=['POST'])
-def process_mapping_route():
+@app.route('/parse_nl', methods=['POST'])
+def parse_natural_language_route():
     """
-    Takes raw rows, column mapping indices, and filters.
-    Returns the cleaned events list for preview.
+    Parse natural language input and return structured event data.
+    
+    Request body:
+        {
+            "input": "Monday 10am Team Meeting for 2 hours"
+        }
+    
+    Response:
+        {
+            "success": true,
+            "event": {
+                "title": "Team Meeting",
+                "date": "2025-01-06",
+                "startTime": "10:00",
+                "endTime": "12:00",
+                "duration": 120
+            }
+        }
     """
     data = request.json
-    raw_rows = data.get('raw_rows', [])
-    mapping = data.get('mapping', {})
-    filters = data.get('filters', '')
+    input_text = data.get('input', '')
     
-    events = apply_mapping_and_filter(raw_rows, mapping, filters)
-    return jsonify({'events': events})
+    if not input_text:
+        return jsonify({'success': False, 'error': 'No input provided'}), 400
+    
+    result = parse_natural_language(input_text)
+    
+    if result.get('error'):
+        return jsonify({'success': False, 'error': result['error']}), 400
+    
+    return jsonify({
+        'success': True,
+        'event': {
+            'title': result['title'],
+            'date': result['date'],
+            'startTime': result['startTime'],
+            'endTime': result['endTime'],
+            'duration': result['duration']
+        }
+    })
 
 @app.route('/generate_ics', methods=['POST'])
 def generate_ics_route():
+    """
+    Generate ICS file from event list.
+    
+    Request body:
+        {
+            "events": [
+                {
+                    "title": "Team Meeting",
+                    "date": "2025-01-15",
+                    "startTime": "10:00",
+                    "endTime": "11:00",
+                    "priority": "yellow",
+                    "notes": ""
+                }
+            ]
+        }
+    
+    Response:
+        ICS file download
+    """
     data = request.json
     events = data.get('events', [])
     
     if not events:
         return jsonify({'error': 'No events to export'}), 400
-        
-    ics_content = create_ics(events)
     
-    # Save generic ics file
-    ics_filename = 'exam_timetable.ics'
-    ics_path = os.path.join(app.config['UPLOAD_FOLDER'], ics_filename)
-    
-    with open(ics_path, 'w') as f:
-        f.write(ics_content)
+    try:
+        ics_content = create_ics(events)
         
-    return send_file(ics_path, as_attachment=True, download_name=ics_filename)
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        ics_filename = f'calendme_schedule_{timestamp}.ics'
+        ics_path = os.path.join(app.config['UPLOAD_FOLDER'], ics_filename)
+        
+        # Write ICS file
+        with open(ics_path, 'w', encoding='utf-8') as f:
+            f.write(ics_content)
+        
+        return send_file(ics_path, as_attachment=True, download_name=ics_filename)
+    
+    except Exception as e:
+        return jsonify({'error': f'Failed to generate ICS: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

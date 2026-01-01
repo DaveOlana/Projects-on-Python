@@ -1,0 +1,7 @@
+Course Code,Course Title,Date,Time,Venue,Invigilators
+CSC 201,Introduction to Computer Science and Programming in Python (Generic Course for all Science Students),2025-01-20,08:30 AM - 11:30 AM,Large Lecture Theater A (Capacity 500),Dr. Smith, Prof. Johnson, Mr. Williams
+MAT 304,Advanced Calculus and Linear Algebra for Engineering Applications,2025-01-22,12:00 PM - 03:00 PM,Engineering Hall B,Dr. Brown
+GNS 101,Use of English and Communication Skills I (Compulsory for all Level 100),2025-01-24,08:00 AM - 10:00 AM,University Auditorium / CBT Centre,Team A
+PHY 102,General Physics II: Electricity and Magnetism,2025-01-26,02:00 PM - 05:00 PM,Science Block Room 101-105,Physics Dept
+,,,,,
+EMPTY_ROW,Should be ignored,,,,,
