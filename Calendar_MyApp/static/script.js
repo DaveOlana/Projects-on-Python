@@ -8,6 +8,8 @@ let events = [];
 let currentTheme = 'light';
 let selectedPriority = 'green';
 let editingEventId = null;
+let isOnline = false;
+let isCheckingServer = false;
 
 // DOM Elements
 const naturalInput = document.getElementById('natural-input');
@@ -16,7 +18,9 @@ const eventsContainer = document.getElementById('events-container');
 const emptyState = document.getElementById('empty-state');
 const eventCountEl = document.getElementById('event-count');
 const parseFeedback = document.getElementById('parse-feedback');
-const exportBtn = document.getElementById('export-ics-btn');
+const exportBtn = document.getElementById('export-btn');
+const exportText = document.getElementById('export-text');
+const exportIcon = document.getElementById('export-icon');
 const themeToggle = document.getElementById('theme-toggle');
 const priorityBtns = document.querySelectorAll('.priority-btn');
 const saveJsonBtn = document.getElementById('save-json-btn');
@@ -41,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     renderEvents();
     updateUI();
+
+    // Check server status on load
+    checkServerStatus();
 });
 
 // ===========================
@@ -70,7 +77,7 @@ function initEventListeners() {
     themeToggle.addEventListener('click', cycleTheme);
 
     // Export
-    exportBtn.addEventListener('click', exportToICS);
+    exportBtn.addEventListener('click', handleExport);
 
     // JSON Import/Export
     saveJsonBtn.addEventListener('click', exportToJSON);
@@ -400,7 +407,7 @@ function createEventCard(event) {
 function updateUI() {
     const count = events.length;
     eventCountEl.textContent = `${count} event${count !== 1 ? 's' : ''}`;
-    exportBtn.disabled = count === 0;
+    updateExportButtonState();
 }
 
 // ===========================
@@ -464,8 +471,182 @@ function applyTheme(theme) {
 }
 
 // ===========================
+// Server Status & Online Detection
+// ===========================
+
+async function checkServerStatus() {
+    if (isCheckingServer) return;
+
+    isCheckingServer = true;
+    updateExportButtonState('checking');
+
+    try {
+        const response = await fetch('/health', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            isOnline = data.online && data.status === 'ok';
+        } else {
+            isOnline = false;
+        }
+    } catch (error) {
+        isOnline = false;
+    }
+
+    isCheckingServer = false;
+    updateExportButtonState();
+}
+
+function updateExportButtonState(state = null) {
+    if (state === 'checking') {
+        exportText.textContent = 'Checking...';
+        exportBtn.disabled = true;
+        return;
+    }
+
+    // Update button based on online status and event count
+    if (events.length === 0) {
+        exportBtn.disabled = true;
+        exportText.textContent = 'Generate Calendar';
+        return;
+    }
+
+    exportBtn.disabled = false;
+
+    if (isOnline) {
+        // Online mode: Add to Calendar (WebCal)
+        exportText.textContent = 'Add to Calendar';
+        exportIcon.innerHTML = `
+            <path d="M8 7V3M16 7V3M7 11H17M5 21H19C20.1046 21 21 20.1046 21 19V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V19C3 20.1046 3.89543 21 5 21Z" 
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"/>
+            <circle cx="12" cy="15" r="1.5" fill="currentColor"/>
+        `;
+    } else {
+        // Offline mode: Download .ics
+        exportText.textContent = 'Download .ics';
+        exportIcon.innerHTML = `
+            <path d="M4 14V17C4 17.5523 4.44772 18 5 18H15C15.5523 18 16 17.5523 16 17V14M10 12V2M10 12L7 9M10 12L13 9" 
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        `;
+    }
+}
+
+// ===========================
 // Export Functionality
 // ===========================
+
+async function handleExport() {
+    if (events.length === 0) return;
+
+    // Ping server before export to ensure current status
+    await checkServerStatus();
+
+    if (isOnline) {
+        await exportViaWebCal();
+    } else {
+        await exportViaDownload();
+    }
+}
+
+async function exportViaWebCal() {
+    try {
+        const response = await fetch('/generate_ics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                events,
+                mode: 'webcal'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate WebCal link');
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.url) {
+            // Show feedback
+            if (data.duplicate) {
+                showFeedback('Reusing existing calendar link...', 'success');
+            } else {
+                showFeedback('Opening in your calendar app...', 'success');
+            }
+
+            // Open WebCal link
+            window.location.href = data.url;
+
+            // Fallback message after delay
+            setTimeout(() => {
+                const stillHere = confirm(
+                    "Calendar app didn't open?\n\nClick OK to download .ics file instead."
+                );
+                if (stillHere) {
+                    exportViaDownload();
+                }
+            }, 3000);
+        } else {
+            throw new Error('Invalid response from server');
+        }
+
+    } catch (error) {
+        console.error('WebCal export error:', error);
+        showFeedback('WebCal failed. Switching to download...', 'error');
+
+        // Fallback to download
+        setTimeout(() => exportViaDownload(), 1500);
+    }
+}
+
+async function exportViaDownload() {
+    // Ask user for filename
+    const defaultName = `My Schedule ${new Date().toLocaleDateString()}`;
+    const customName = prompt('Enter a name for your calendar file:', defaultName);
+
+    if (customName === null) {
+        // User cancelled
+        return;
+    }
+
+    try {
+        const response = await fetch('/generate_ics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                events,
+                mode: 'download',
+                filename: customName || defaultName
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate ICS file');
+        }
+
+        // Download file
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${customName || defaultName}.ics`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        showFeedback('Calendar downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Download export error:', error);
+        showFeedback('Failed to export calendar', 'error');
+    }
+}
 
 async function exportToICS() {
     if (events.length === 0) return;

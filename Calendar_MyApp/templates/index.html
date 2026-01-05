@@ -144,13 +144,13 @@
 
         <!-- Export Section -->
         <section class="export-section">
-            <button class="export-btn" id="export-ics-btn" disabled>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <button class="export-btn" id="export-btn" disabled>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" id="export-icon">
                     <path
                         d="M4 14V17C4 17.5523 4.44772 18 5 18H15C15.5523 18 16 17.5523 16 17V14M10 12V2M10 12L7 9M10 12L13 9"
                         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                Generate Calendar (.ics)
+                <span id="export-text">Generate Calendar</span>
             </button>
 
             <button class="import-guide-btn" id="import-guide-btn">
@@ -244,19 +244,65 @@
     <div class="modal-overlay" id="import-guide-modal" style="display: none;">
         <div class="modal-content import-guide-modal">
             <div class="modal-header">
-                <h3>📖 How to Import Your Calendar</h3>
+                <h3>📖 CalendME Guide</h3>
                 <button class="modal-close" id="close-import-guide">×</button>
             </div>
 
             <div class="guide-tabs">
-                <button class="guide-tab active" data-tab="google">📅 Google Calendar</button>
-                <button class="guide-tab" data-tab="apple">🍎 Apple Calendar</button>
-                <button class="guide-tab" data-tab="outlook">📧 Outlook</button>
+                <button class="guide-tab active" data-tab="usage">How to Use</button>
+                <button class="guide-tab" data-tab="google">Google Calendar</button>
+                <button class="guide-tab" data-tab="apple">Apple Calendar</button>
+                <button class="guide-tab" data-tab="outlook">Outlook</button>
             </div>
 
             <div class="guide-content">
+                <!-- How to Use Tab -->
+                <div class="guide-panel active" id="usage-guide">
+                    <h4>Quick Start Guide</h4>
+
+                    <div class="guide-section">
+                        <h5>➕ Adding Events</h5>
+                        <p><strong>Type in natural language:</strong></p>
+                        <ul class="guide-steps">
+                            <li>"Monday 10am Team Meeting for 2 hours"</li>
+                            <li>"Tomorrow 3pm Football"</li>
+                            <li>"4th of January study from 6am to 10am"</li>
+                            <li>"Next Friday 2pm Review. Reminder 30 min before"</li>
+                        </ul>
+                        <p>Select priority (🔴 Urgent / 🟡 Important / 🟢 Normal) then click <strong>Add Event</strong>
+                        </p>
+                    </div>
+
+                    <div class="guide-section">
+                        <h5>✏️ Managing Events</h5>
+                        <ul class="guide-steps">
+                            <li><strong>Edit:</strong> Click pencil icon, modify details, save</li>
+                            <li><strong>Delete:</strong> Click × icon to remove</li>
+                            <li><strong>Auto-sort:</strong> Events organize chronologically</li>
+                            <li><strong>Conflicts:</strong> App warns if events overlap</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-section">
+                        <h5>📤 Exporting</h5>
+                        <p><strong>Add to Calendar (Online):</strong> One-click opens your calendar app</p>
+                        <p><strong>Download .ics (Offline):</strong> Save file, import manually (see tabs above)</p>
+                        <p><strong>Backup:</strong> Click "Save JSON" to backup all events</p>
+                    </div>
+
+                    <div class="guide-section">
+                        <h5>🎨 Themes & More</h5>
+                        <ul class="guide-steps">
+                            <li><strong>Theme:</strong> Click ☀️/🌙 icon to switch Light/Dark/Ambient</li>
+                            <li><strong>Backup:</strong> "Save JSON" / "Load JSON" for backup/restore</li>
+                            <li><strong>Clear:</strong> "Clear All" deletes everything (save first!)</li>
+                            <li><strong>Auto-save:</strong> All changes saved automatically to browser</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- Google Calendar Tab -->
-                <div class="guide-panel active" id="google-guide">
+                <div class="guide-panel" id="google-guide">
                     <h4>Google Calendar Import</h4>
 
                     <div class="guide-section">

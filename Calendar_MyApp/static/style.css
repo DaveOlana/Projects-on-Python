@@ -694,6 +694,25 @@ body {
     font-weight: 600;
 }
 
+.guide-steps li,
+.guide-section ul li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.guide-section ul {
+    margin-left: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    list-style-type: disc;
+}
+
+.guide-section p {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
 .guide-steps code {
     background: var(--bg-secondary);
     padding: 2px 6px;
