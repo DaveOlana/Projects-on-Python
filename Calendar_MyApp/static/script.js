@@ -142,7 +142,7 @@ async function handleAddEvent() {
         const data = await response.json();
 
         if (!data.success) {
-            showFeedback(data.error || 'Failed to parse input', 'error');
+            showFeedback("Couldn't understand that. Try: 'Monday 10am Team meeting'", 'error');
             return;
         }
 
@@ -182,7 +182,7 @@ async function handleAddEvent() {
         naturalInput.value = '';
 
         // Show reminder info if present
-        let feedbackMsg = `Added: ${newEvent.title}`;
+        let feedbackMsg = `✓ All set! ${newEvent.title} added`;
         if (newEvent.reminder) {
             feedbackMsg += ` (⏰ ${newEvent.reminder}min reminder)`;
         }
@@ -196,7 +196,7 @@ async function handleAddEvent() {
 
     } catch (error) {
         console.error('Error adding event:', error);
-        showFeedback('Failed to add event. Please try again.', 'error');
+        showFeedback("Couldn't understand that. Try: 'Tomorrow 3pm Meeting'", 'error');
     }
 }
 
