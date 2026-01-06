@@ -3,4 +3,5 @@ ics==0.7.2
 dateparser==1.2.0
 parsedatetime==2.6
 python-dateutil==2.8.2
+gunicorn==21.2.0
 werkzeug==3.0.1
