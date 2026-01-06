@@ -441,8 +441,8 @@ function loadThemePreference() {
         currentTheme = saved;
         applyTheme(currentTheme);
     } else {
-        // Auto-detect based on time of day for ambient mode
-        currentTheme = 'ambient';
+        // Default to dark mode
+        currentTheme = 'dark';
         applyTheme(currentTheme);
     }
 }
