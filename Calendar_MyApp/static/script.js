@@ -48,6 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check server status on load
     checkServerStatus();
+
+    // Remove loader when app is ready
+    setTimeout(() => {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+            loader.classList.add('loaded');
+            document.body.classList.add('app-ready');
+            // Remove from DOM after fade out
+            setTimeout(() => loader.remove(), 400);
+        }
+    }, 100); // Small delay to ensure rendering
 });
 
 // ===========================
