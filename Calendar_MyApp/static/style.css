@@ -151,12 +151,19 @@ body {
 
 .logo-container {
     display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.logo-top {
+    display: flex;
     align-items: center;
     gap: var(--spacing-sm);
 }
 
 .logo-icon {
-    color: var(--accent-primary);
+    border-radius: 6px;
+    object-fit: contain;
 }
 
 .logo-text {
@@ -169,8 +176,8 @@ body {
 .logo-tagline {
     font-size: 12px;
     font-weight: 400;
-    color: var(--text-muted);
-    margin-top: 2px;
+    color: var(--text-secondary);
+    margin-left: 40px;
     letter-spacing: 0;
 }
 

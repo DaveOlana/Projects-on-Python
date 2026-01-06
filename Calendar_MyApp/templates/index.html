@@ -86,6 +86,12 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon.png') }}">
+
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#007AFF">
     <meta name="description" content="Create and organize your schedule with natural language">
@@ -96,15 +102,8 @@
     <div id="app-loader">
         <div class="loader-brand">
             <div class="loader-logo">
-                <svg class="loader-icon" width="48" height="48" viewBox="0 0 32 32" fill="none">
-                    <rect x="4" y="6" width="24" height="22" rx="3" stroke="currentColor" stroke-width="2" />
-                    <line x1="4" y1="12" x2="28" y2="12" stroke="currentColor" stroke-width="2" />
-                    <circle cx="11" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="16" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="21" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="11" cy="23" r="1.5" fill="currentColor" />
-                    <circle cx="16" cy="23" r="1.5" fill="currentColor" />
-                </svg>
+                <img src="{{ url_for('static', filename='favicon.png') }}" alt="CalendME" class="loader-icon"
+                    style="width: 48px; height: 48px; border-radius: 8px;">
                 <h1 class="loader-text">CalendME</h1>
             </div>
             <div class="loader-spinner"></div>
@@ -116,16 +115,11 @@
     <header class="app-header">
         <div class="header-left">
             <div class="logo-container">
-                <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect x="4" y="6" width="24" height="22" rx="3" stroke="currentColor" stroke-width="2" />
-                    <line x1="4" y1="12" x2="28" y2="12" stroke="currentColor" stroke-width="2" />
-                    <circle cx="11" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="16" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="21" cy="18" r="1.5" fill="currentColor" />
-                    <circle cx="11" cy="23" r="1.5" fill="currentColor" />
-                    <circle cx="16" cy="23" r="1.5" fill="currentColor" />
-                </svg>
-                <h1 class="logo-text">CalendME</h1>
+                <div class="logo-top">
+                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="CalendME Logo" class="logo-icon"
+                        width="32" height="32">
+                    <h1 class="logo-text">CalendME</h1>
+                </div>
                 <p class="logo-tagline">Smart schedule builder</p>
             </div>
         </div>
@@ -183,7 +177,6 @@
         <section class="quick-add-card">
             <div class="quick-add-header">
                 <h2>Let's plan something great together!</h2>
-                <p class="quick-add-hint">Type naturally: "Monday 10am Team meeting" or "Tomorrow 3pm Football"</p>
             </div>
 
             <div class="quick-add-form">
